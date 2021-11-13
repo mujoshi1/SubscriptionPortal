@@ -1,4 +1,4 @@
-# OpenShiftHrOffice
+# Subscription Portal
 test for Openshift
 .NET Core Sample App for OpenShift
 This repository contains a simple MVC .NET Core application that can be deployed on OpenShift.
@@ -11,15 +11,15 @@ Deploy using the OpenShift client ('oc')
 $ oc new-project mydemo
 
 # Add the .NET Core application
-$ oc new-app --name=OpenShiftHrApp dotnet:3.1~https://github.com/ndgaikwad/OpenShiftHrOffice#master --context-dir HrOffice
+$ oc new-app --name=SubscriptionPortal dotnet:3.1~https://github.com/mujoshi1/SubscriptionPortal#master --context-dir SubscriptionPortal
 
 # Make the .NET Core application accessible externally and show the url
 $ oc expose service OpenShiftHrApp
 $ oc get route OpenShiftHrApp
 Deploy using the OpenShift Do ('odo')
 # Use git to check out the .NET Core application
-$ git clone https://github.com/ndgaikwad/OpenShiftHrOffice
-$ cd OpenShiftHrOffice/HrOffice
+$ git clone https://github.com/mujoshi1/SubscriptionPortal
+$ cd SubscriptionPortal/SubscriptionPortal
 $ git checkout dotnetcore-3.1
 
 # Create a new OpenShift project
