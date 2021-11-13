@@ -23,9 +23,10 @@ namespace SubscriptionPortal
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSession(options => {
-                options.IdleTimeout = System.TimeSpan.FromMinutes(50);
-            });
+            services.AddSession();
+            //services.AddSession(options => {
+            //    options.IdleTimeout = System.TimeSpan.FromMinutes(50);
+            //});
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -39,7 +40,7 @@ namespace SubscriptionPortal
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-
+            //ASPNETCORE_ENVIRONMENT  = Development
             var host = Configuration["DBHOST"] ?? "localhost";//mysqlhrdev//mysqlhrqa //127/0.0.1 / env Variable /mysqlhrstage /mysqldevdb ( new use)// SubscriptionPortalmysql
             var port = Configuration["DBPORT"] ?? "3306";
             var databasename = Configuration["DBNAME"] ?? "subscriptiondb";   //"hrdbdev";  // SubscriptionPortaldb
