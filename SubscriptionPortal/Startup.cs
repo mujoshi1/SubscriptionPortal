@@ -52,7 +52,7 @@ namespace SubscriptionPortal
             {
                 options.UseMySql(
                     $"server={host}; userid={userid}; pwd={password};"
-                                + $"port={port}; database={databasename}");
+                                + $"port={port}; database={databasename}", options => options.EnableRetryOnFailure());
             });
 
             services.AddControllersWithViews();
