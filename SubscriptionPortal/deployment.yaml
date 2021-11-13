@@ -1,0 +1,410 @@
+﻿apiVersion: v1
+kind: Template
+metadata:
+  name: "openshifthrapp-template"
+  annotations:
+    description: "Demo People API"
+    iconClass: "icon-dotnet"
+    tags: "dotnet,core"
+labels:
+  application: "openshifthrapp"
+  createdBy: "openshifthrapp-template"
+objects:
+  - apiVersion: v1
+    kind: "ImageStream"
+    metadata:
+      name: "openshifthrapp"
+  - apiVersion: v1
+    kind: "ImageStream"
+    metadata:
+      name: "openshifthrappdb"
+  - apiVersion: v1
+    kind: "BuildConfig"
+    metadata:
+      name: "openshifthrapp-bc"
+      annotations:
+        description: "Defines how to build the People API webapi app."
+      labels:
+        app: openshifthrapp
+      namespace: openshifthrapp
+    spec:
+      completionDeadlineSeconds: 3600
+      env:
+        - name: "GIT_SSL_NO_VERIFY"
+          value: "true"
+      source:
+        type: "Git"
+        git:
+          ref: ${CONSUMER_GIT_BRANCH}
+          uri: ${CONSUMER_GIT_URL}
+        contextDir: "/"
+      strategy:
+        dockerStrategy:
+          dockerfilePath: Dockerfile
+      output:
+        to:
+          kind: "ImageStreamTag"
+          name: "openshifthrapp:latest"
+  - apiVersion: v1
+    kind: "BuildConfig"
+    metadata:
+      name: "openshifthrappdb-bc"
+      annotations:
+        description: "Defines how to build the People API database."
+      labels:
+        app: openshifthrappdb
+      namespace: openshifthrapp
+    spec:
+      completionDeadlineSeconds: 3600
+      env:
+        - name: "GIT_SSL_NO_VERIFY"
+          value: "true"
+      source:
+        type: "Git"
+        git:
+          ref: ${CONSUMER_GIT_BRANCH}
+          uri: ${CONSUMER_GIT_URL}
+        contextDir: "database"
+      strategy:
+        dockerStrategy:
+          dockerfilePath: Dockerfile
+      output:
+        to:
+          kind: "ImageStreamTag"
+          name: "openshifthrappdb:latest"
+  - apiVersion: v1
+    kind: "BuildConfig"
+    metadata:
+      name: "openshifthrapp-bc-pipeline"
+    spec:
+      completionDeadlineSeconds: 3600
+      source:
+        git:
+          ref: ${CONSUMER_GIT_BRANCH}
+          uri: ${CONSUMER_GIT_URL}
+        sourceSecret:
+          name: "openshifthrapp-source-control"
+      strategy:
+        jenkinsPipelineStrategy:
+          jenkinsfilePath: Jenkinsfile
+  - apiVersion: v1
+    kind: "Service"
+    metadata:
+      name: "openshifthrapp-svc"
+      annotations:
+        description: "Exposes and load balances the application pods"
+    spec:
+      ports:
+        - name: "openshifthrapp"
+          port: 8080
+          targetPort: 8080
+      selector:
+        name: "openshifthrapp"
+  - apiVersion: v1
+    kind: "Service"
+    metadata:
+      name: "openshifthrappdb-svc"
+      annotations:
+        description: "Exposes the application database"
+    spec:
+      ports:
+        - name: "openshifthrappdb"
+          port: 1433
+          targetPort: 1433
+      selector:
+        name: "openshifthrappdb"
+  - apiVersion: v1
+    kind: Route
+    metadata:
+      annotations:
+        openshift.io/host.generated: 'true'
+      labels:
+        app: openshifthrapp
+      name: openshifthrapp
+      namespace: openshifthrapp
+    spec:
+      to:
+        kind: Service
+        name: openshifthrapp-svc
+        weight: 100
+      wildcardPolicy: None
+  - apiVersion: v1
+    kind: "DeploymentConfig"
+    metadata:
+      name: "openshifthrapp-dc"
+      annotations:
+        description: "Handles deployment of the demo People API application"
+      generation: 2
+      labels:
+        app: openshifthrapp-template
+        application: openshifthrapp
+        createdBy: openshifthrapp-template
+      namespace: openshifthrapp
+    spec:
+      replicas: 1
+      selector:
+        name: openshifthrapp
+      strategy:
+        activeDeadlineSeconds: 21600
+        recreateParams:
+          timeoutSeconds: 600
+        resources: {}
+        type: Recreate
+      template:
+        metadata:
+          labels:
+            name: "openshifthrapp"
+        spec:
+          containers:
+            - name: openshifthrapp
+              env:
+                - name: ASPNETCORE_ENVIRONMENT
+                  value: Development
+                - name: ASPNETCORE_URLS
+                  value: 'http://*:8080'
+                - name: openshifthrappcontext
+                  value: ${openshifthrapp_CONN_STRING}
+              image: 'openshifthrapp/openshifthrapp:latest'
+              imagePullPolicy: IfNotPresent
+              ports:
+                - containerPort: 8080
+                  protocol: TCP
+              resources: 
+                limits:
+                  cpu: 750m
+                  memory: 1Gi
+                requests:
+                  cpu: 250m
+                  memory: 350Mi
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+      test: false
+      triggers:
+      - type: "ConfigChange"
+      - type: "ImageChange"
+        imageChangeParams:
+          automatic: true
+          containerNames:
+          - "openshifthrapp"
+          from:
+            kind: "ImageStreamTag"
+            name: "openshifthrapp:latest"
+  - apiVersion: v1
+    kind: "DeploymentConfig"
+    metadata:
+      name: "openshifthrappdb-dc"
+      annotations:
+        description: "Handles deployment of the demo People API MSSQL Express Linux database"
+      generation: 2
+      labels:
+        app: openshifthrapp-template
+        application: openshifthrapp
+        createdBy: openshifthrapp-template
+      namespace: openshifthrapp
+    spec:
+      replicas: 1
+      selector:
+        name: openshifthrappdb
+      strategy:
+        activeDeadlineSeconds: 21600
+        recreateParams:
+          timeoutSeconds: 600
+        resources: {}
+        type: Recreate
+      template:
+        metadata:
+          labels:
+            name: "openshifthrappdb"
+        spec:
+          containers:
+            - name: openshifthrappdb
+              image: 'openshifthrapp/openshifthrappdb:latest'
+              imagePullPolicy: IfNotPresent
+              ports:
+                - containerPort: 1433
+                  protocol: TCP
+              resources: 
+                limits:
+                  cpu: 500m
+                  memory: 750Mi
+                requests:
+                  cpu: 250m
+                  memory: 250Mi
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /var/opt/mssql
+                  name: mssql-data
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - name: mssql-data
+              persistentVolumeClaim:
+                claimName: mssql-openshifthrappdb-data
+      test: false
+      triggers:
+      - type: "ConfigChange"
+      - type: "ImageChange"
+        imageChangeParams:
+          automatic: true
+          containerNames:
+          - "openshifthrappdb"
+          from:
+            kind: "ImageStreamTag"
+            name: "openshifthrappdb:latest"
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: mssql-openshifthrappdb-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: ${MSSQL_VOLUME_CAPACITY}
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: jenkins-agent-base
+      labels:
+        role: jenkins-slave
+    data:
+      base: |-
+        <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+          <inheritFrom></inheritFrom>
+          <name>base</name>
+          <instanceCap>100</instanceCap>
+          <idleMinutes>0</idleMinutes>
+          <label>base</label>
+          <serviceAccount>jenkins</serviceAccount>
+          <nodeSelector></nodeSelector>
+          <volumes/>
+          <containers>
+            <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+              <name>jnlp</name>
+              <image>docker.io/openshift/jenkins-slave-base-centos7</image>
+              <privileged>false</privileged>
+              <alwaysPullImage>false</alwaysPullImage>
+              <workingDir>/tmp</workingDir>
+              <command></command>
+              <args>${computer.jnlpmac} ${computer.name}</args>
+              <ttyEnabled>false</ttyEnabled>
+              <resourceRequestCpu></resourceRequestCpu>
+              <resourceRequestMemory></resourceRequestMemory>
+              <resourceLimitCpu></resourceLimitCpu>
+              <resourceLimitMemory></resourceLimitMemory>
+              <envVars/>
+            </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+          </containers>
+          <envVars/>
+          <annotations/>
+          <imagePullSecrets/>
+          <nodeProperties/>
+        </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: jenkins-agent-dotnetcore31
+      labels:
+        role: jenkins-slave
+    data:
+      dotnetcore31: |-
+        <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+          <inheritFrom></inheritFrom>
+          <name>dotnetcore31</name>
+          <instanceCap>100</instanceCap>
+          <idleMinutes>0</idleMinutes>
+          <label>dotnetcore31</label>
+          <serviceAccount>jenkins</serviceAccount>
+          <nodeSelector></nodeSelector>
+          <volumes/>
+          <containers>
+            <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+              <name>jnlp</name>
+              <image>registry.redhat.io/dotnet/dotnet-31-runtime-rhel7</image>
+              <privileged>false</privileged>
+              <alwaysPullImage>false</alwaysPullImage>
+              <workingDir>/tmp</workingDir>
+              <command></command>
+              <args>${computer.jnlpmac} ${computer.name}</args>
+              <ttyEnabled>false</ttyEnabled>
+              <resourceRequestCpu></resourceRequestCpu>
+              <resourceRequestMemory></resourceRequestMemory>
+              <resourceLimitCpu></resourceLimitCpu>
+              <resourceLimitMemory></resourceLimitMemory>
+              <envVars/>
+            </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+          </containers>
+          <envVars/>
+          <annotations/>
+          <imagePullSecrets/>
+          <nodeProperties/>
+        </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: jenkins-agent-sonar-dotnet
+      labels:
+        role: jenkins-slave
+    data:
+      dotnetcore21: |-
+        <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+          <inheritFrom></inheritFrom>
+          <name>sonar-dotnet</name>
+          <instanceCap>2147483647</instanceCap>
+          <idleMinutes>0</idleMinutes>
+          <label>sonar-dotnet</label>
+          <serviceAccount>jenkins</serviceAccount>
+          <nodeSelector></nodeSelector>
+          <volumes/>
+          <containers>
+            <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+              <name>jnlp</name>
+              <image>172.30.1.1:5000/openshift/jenkins-slave-sonarqube-dotnet</image>
+              <privileged>false</privileged>
+              <alwaysPullImage>false</alwaysPullImage>
+              <workingDir>/tmp</workingDir>
+              <command></command>
+              <args>${computer.jnlpmac} ${computer.name}</args>
+              <ttyEnabled>false</ttyEnabled>
+              <resourceRequestCpu></resourceRequestCpu>
+              <resourceRequestMemory></resourceRequestMemory>
+              <resourceLimitCpu></resourceLimitCpu>
+              <resourceLimitMemory></resourceLimitMemory>
+              <envVars/>
+            </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+          </containers>
+          <envVars/>
+          <annotations/>
+          <imagePullSecrets/>
+          <nodeProperties/>
+        </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+parameters:
+  - name: "CONSUMER_GIT_URL"
+    displayName: "Source Repository URL"
+    description: "The URL of the repository with your application source code"
+    value: "https://github.com/Cingulara/openshifthrapp-jenkins-auto-deploy.git"
+    required: true
+  - name: "CONSUMER_GIT_BRANCH"
+    displayName: "Source Repository Branch"
+    description: "The branch within the git repository with your application source code"
+    value: "develop"
+    required: true
+  - name: "openshifthrapp_CONN_STRING"
+    displayName: "Connection String for openshifthrapp"
+    description: "The database connection string for the openshifthrappdb database for this API"
+    value: "server=openshifthrappdb; user id=openshifthrapp; password=myP@ssw0rd; initial catalog=openshifthrapp;"
+    required: true
+  - name: MSSQL_VOLUME_CAPACITY
+    description: Volume space available for MSSQL
+    displayName: MSSQL Volume Capacity
+    required: true
+    value: 1Gi

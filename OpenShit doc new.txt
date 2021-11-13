@@ -1,0 +1,138 @@
+https://www.redhat.com/en/blog/part-2-connecting-ocp-application-mysql-instance
+https://docs.okd.io/latest/cli_reference/openshift_cli/developer-cli-commands.html
+
+oc get pods 
+mysqlhrdev
+PS C:\WINDOWS\system32> oc get pod
+PS C:\WINDOWS\system32> oc port-forward mysqlhr-2-lq9xc : 3306
+oc port-forward mysqlhrstage-1-kclhl : 3306
+
+use hrdbqa;
+CREATE TABLE Employee (
+  EmpId int NOT NULL AUTO_INCREMENT,
+  Name varchar(250) NOT NULL,
+  EmailId varchar(50) DEFAULT NULL,
+  Department varchar(20) DEFAULT NULL,
+  Location varchar(200) DEFAULT NULL,
+  PRIMARY KEY (EmpId)
+) ;
+
+Using project "mujsohi1-stage". ( swith betweek dev adn stage to starte Db service) 
+oc project mujsohi1-stage
+
+oc port-forward mysqlhrdev-1-z5qvz : 3306
+
+oc port-forward mysqlhrstage-1-qsztv : 3306
+oc port-forward mysqlhrstage-1-wvmm7 : 3306
+
+https://github.com/mujoshi1/OpenShiftHrOffice
+https://console-openshift-console.apps.sandbox.x8i5.p1.openshiftapps.com/k8s/ns/mujsohi1-dev/services/mysqlhrdev
+
+
+https://cloud.ibm.com/login?redirect=%2Fkubernetes%2Fcatalog%2Fcreate%3FplatformType%3Dopenshift
+
+
+and enviroenmnet varoable as DB secret  details 
+1) ASPNETCORE_ENVIRONMENT environment variable to Development
+....
+
+https://cloud.ibm.com/login?redirect=%2Fkubernetes%2Fcatalog%2Fcreate%3FplatformType%3Dopenshift
+
+https://github.com/PomeloFoundation/Pomelo.EntityFrameworkCore.MySql/issues/1247
+
+
+telnet 10.176.86.45 4133
+GLDVLP in  config file 
+
+
+External Certification :  
+https://developers.redhat.com/developer-sandbox
+Redhad Sandbox :  mujsohi1
+mujoshi1@in.ibm.com
+
+create pod for mySQL +Add
+
+hrusername
+hrpassword
+hrdbdev
+develope sand boc Open shift
+https://console-openshift-console.apps.sandbox.x8i5.p1.openshiftapps.com/topology/ns/mujsohi1-dev?view=graph
+
+mySQL workbench
+Db namre: hrdbdev 
+pass : hrpassword
+root passwortd : hrpassword
+Db usre : hrusername
+service name : myhrdbdev
+
+Db server name  mysqlhrstage  ( user is (hrdbstage) for DB  user is hrusername)
+Dn name : hrdbstage
+pass : hrpassword
+root passwortd : hrpassword
+Db usre : hrusername
+
+ACT : 32960033 -;pass
+
+use login toket from sadbox   in cmd  promt in OC  folder 
+C:\WPP\Software\oc> oc login --token=sha256~pkIO1-CaAYYR2-ayD8WmHvKIKz3rqq5qfEOAjvpgSZk --server=https://api.sandbox.x8i5.p1.openshiftapps.com:6443
+
+get runnig pod details 
+change betweensandbod  pod env : Using project "mujsohi1-dev". ( swith betweek dev adn stage to starte Db service)
+C:\WPP\Software\oc>Using project "mujsohi1-dev"
+
+
+Jenkin script 
+pipeline {
+    agent none
+    stages {
+    	stage('Build Image') {
+          agent { label 'dotnetcore31' }
+          steps {
+            script {
+              openshift.withCluster() {
+                openshift.withProject("mujsohi1-stage") {
+                  openshift.selector("bc", "open-shift-hr-office-git-stage").startBuild("--wait=true")   
+                }
+              }
+            }
+          }
+        }
+    }
+}
+
+pipeline {
+    agent none
+    stages {
+    	stage('Build Image') {
+          agent { label 'dotnetcore31' }
+          steps {
+            script {
+              openshift.withCluster() {
+                openshift.withProject("mujsohi1-dev") {
+                  openshift.selector("bc", "hrofficedev").startBuild("--wait=true")
+                }
+              }
+            }
+          }
+        }
+    }
+}
+
+// hrofficedev - app name 
+//mujsohi1-stage - env name 
+
+
+Environment Variables
+Secrets 
+ASPNETCORE_ENVIRONMENT  = Development
+check othere in application 
+DBHOST = localhost // name of POD /conrainer
+DBPORT  =...3306
+DBNAME = 
+DBUSER =
+DBPASSWORD=
+all ...
+
+
+Jinkins
+add- Config map  - Github (dotnetcore31JenkinsSlaveConfigMap.yaml)

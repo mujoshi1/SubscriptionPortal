@@ -1,0 +1,13 @@
+#!groovy
+def DEV_PROJECTNAME = "mujoshi1-dev"
+def UAT_PROJECTNAME = "mujoshi1-stage"
+def BUILDCONFIGNAME="hrappnil1"
+def IMAGE_NAME="hrappnil1:latest"
+def UATIMAGENAME = "hrappnil1:UATReady-1.0.0"
+node('dotnetcore31') {
+   stage('Build Image') {    
+    sh "oc -n $DEV_PROJECTNAME new-app --name=$BUILDCONFIGNAME dotnet:3.1~https://github.com/mujoshi1/OpenShiftSubscriptionPortal --context-dir SubscriptionPortal --source-secret nil-at-github"    
+    sh "oc expose service $BUILDCONFIGNAME"
+    sh "oc -n $DEV_PROJECTNAME tag $DEV_PROJECTNAME/$IMAGE_NAME $UAT_PROJECTNAME/$UATIMAGENAME"
+  }
+}

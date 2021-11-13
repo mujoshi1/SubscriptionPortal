@@ -1,0 +1,71 @@
+﻿@model IEnumerable<SubscriptionPortal.Models.Subscription>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<p>
+    <a asp-action="Create">Add New Subscriptions</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th contenteditable="false">
+                @Html.DisplayNameFor(model => model.ApplicationName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CompanyName)
+            </th>
+            <th contenteditable="false">
+                @Html.DisplayNameFor(model => model.DBName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DBUserId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DBUserPassword)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EmailId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Location)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>        
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ApplicationName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CompanyName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DBName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DBUserId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DBUserPassword)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EmailId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Location)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.SubscriptionId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.SubscriptionId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.SubscriptionId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,61 @@
+﻿@model SubscriptionPortal.Models.Subscription
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>Edit Subscription</h3>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="SubscriptionId" />
+            <div class="form-group" contenteditable="false">
+                <label asp-for="ApplicationName" class="control-label"></label>
+                <input asp-for="ApplicationName" class="form-control" disabled />
+                <span asp-validation-for="ApplicationName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CompanyName" class="control-label"></label>
+                <input asp-for="CompanyName" class="form-control" />
+                <span asp-validation-for="CompanyName" class="text-danger"></span>
+            </div>
+            <div class="form-group" contenteditable="false">
+                <label asp-for="DBName" class="control-label"></label>
+                <input asp-for="DBName" class="form-control" />
+                <span asp-validation-for="DBName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DBUserId" class="control-label"></label>
+                <input asp-for="DBUserId" class="form-control" />
+                <span asp-validation-for="DBUserId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DBUserPassword" class="control-label"></label>
+                <input asp-for="DBUserPassword" class="form-control" />
+                <span asp-validation-for="DBUserPassword" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EmailId" class="control-label"></label>
+                <input asp-for="EmailId" class="form-control" />
+                <span asp-validation-for="EmailId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Location" class="control-label"></label>
+                <input asp-for="Location" class="form-control" />
+                <span asp-validation-for="Location" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+            <input type="hidden" asp-for="Userid" asp-items="@ViewBag.Userid" />
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

@@ -1,0 +1,60 @@
+﻿@model SubscriptionPortal.Models.Subscription
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>Subscription Details</h3>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2" contenteditable="false">
+            @Html.DisplayNameFor(model => model.ApplicationName)
+        </dt>
+        <dd class="col-sm-10" contenteditable="false">
+            @Html.DisplayFor(model => model.ApplicationName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CompanyName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CompanyName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DBName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DBName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DBUserId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DBUserId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DBUserPassword)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DBUserPassword)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.EmailId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.EmailId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Location)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Location)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.SubscriptionId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
