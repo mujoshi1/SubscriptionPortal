@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Management.Automation;
+using System.Management.Automation.Runspaces;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.PowerShell;
 using SubscriptionPortal.Models;
 
 namespace SubscriptionPortal.Controllers
@@ -18,7 +25,7 @@ namespace SubscriptionPortal.Controllers
         {
             _context = context;
         }
-       
+
         // GET: Subscription
         public async Task<IActionResult> Index()
         {
@@ -64,6 +71,128 @@ namespace SubscriptionPortal.Controllers
 
         }
 
+
+        private static void RunPowershellScript(string containername, string podname, string dbname, string dbusername, string dbpassword, string rootuser, string rootpassword, string appname)
+        {
+            string fullPath = Path.GetFullPath("Files/0.mysqlscript.ps1");
+            //string fileName = Path.GetFileName("Files/0.mysqlscript.ps1");
+
+            //using (RunspaceInvoke invoker = new RunspaceInvoke())
+            //{
+            //    invoker.Invoke("Set-ExecutionPolicy Unrestricted");
+            //}
+
+            //StringBuilder OSScript = new StringBuilder("Set-ExecutionPolicy -Scope Process -ExecutionPolicy Unrestricted;");
+            //OSScript.Append(@"other really exciting stuff");
+
+            string cmdArg = fullPath;
+            Runspace runspace = RunspaceFactory.CreateRunspace();
+            //runspace.ApartmentState = System.Threading.ApartmentState.STA;
+            runspace.ThreadOptions = PSThreadOptions.UseCurrentThread;
+
+            runspace.Open();
+
+            Pipeline pipeline = runspace.CreatePipeline();
+            //pipeline.Commands.Add("Set-ExecutionPolicy");
+
+            Command command = new Command(cmdArg);
+
+            CommandParameter usernameParm = new CommandParameter("username", "mujoshi1");
+            command.Parameters.Add(usernameParm);
+            CommandParameter userpasswordParm = new CommandParameter("userpassword", "Welcome@IBM9535084436s");
+            command.Parameters.Add(userpasswordParm);
+            CommandParameter serverlinkParm = new CommandParameter("serverlink", "https://api.sandbox.x8i5.p1.openshiftapps.com:6443");
+            command.Parameters.Add(serverlinkParm);
+            CommandParameter servertokenParm = new CommandParameter("servertoken", "sha256~dCDKlZ5DVXxVub8nYlQGTn3pX5cLFHnDOWNXph7mmIo");
+            command.Parameters.Add(servertokenParm);
+            CommandParameter containernameParm = new CommandParameter("containername", containername);
+            command.Parameters.Add(containernameParm);
+            CommandParameter podnameParm = new CommandParameter("podname", podname);
+            command.Parameters.Add(podnameParm);
+            CommandParameter dbnameParm = new CommandParameter("dbname", dbname);
+            command.Parameters.Add(dbnameParm);
+            CommandParameter dbusernameParm = new CommandParameter("dbusername", dbusername);
+            command.Parameters.Add(dbusernameParm);
+            CommandParameter dbpasswordParm = new CommandParameter("dbpassword", dbpassword);
+            command.Parameters.Add(dbpasswordParm);
+            CommandParameter rootuserParm = new CommandParameter("rootuser", rootuser);
+            command.Parameters.Add(rootuserParm);
+            CommandParameter rootpasswordParm = new CommandParameter("rootpassword", rootpassword);
+            command.Parameters.Add(rootpasswordParm);
+            CommandParameter envnameParm = new CommandParameter("envname", "Development");
+            command.Parameters.Add(envnameParm);
+            CommandParameter appnameParm = new CommandParameter("appname", appname);
+            command.Parameters.Add(appnameParm);
+
+            pipeline.Commands.Add(command);
+            //pipeline.Commands.AddScript(cmdArg);
+
+            pipeline.Commands[0].MergeMyResults(PipelineResultTypes.Error, PipelineResultTypes.Output);
+            Collection<PSObject> results = pipeline.Invoke("Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned");
+            var error = pipeline.Error.ReadToEnd();
+            runspace.Close();
+
+            if (error.Count >= 1)
+            {
+                string errors = "";
+                foreach (var Error in error)
+                {
+                    errors = errors + " " + Error.ToString();
+                }
+            }
+            if (results != null)
+            {
+            }
+
+            ////Execute PS1(PowerShell script) file
+            //using (PowerShell PowerShellInst = PowerShell.Create())
+            //{
+            //    //string path = Path.GetFullPath("~/0.mysqlscript.ps1");
+            //    //string path = System.IO.Path.GetDirectoryName(@"C:\Temp\") + "\\Get-EventLog.ps1";
+            //   // path = System.IO.Path.GetDirectoryName(@"C:\Temp\") + "\\0.mysqlscript.ps1";
+            //    if (!string.IsNullOrEmpty(fullPath))
+            //    {
+            //        PowerShellInst.AddScript(System.IO.File.ReadAllText(fullPath));
+            //        PowerShellInst.AddParameter("username", "mujoshi1");
+            //        PowerShellInst.AddParameter("userpassword", "Welcome@IBM9535084436s");
+            //        PowerShellInst.AddParameter("serverlink", "https://api.sandbox.x8i5.p1.openshiftapps.com:6443");
+            //        PowerShellInst.AddParameter("servertoken", "sha256~dCDKlZ5DVXxVub8nYlQGTn3pX5cLFHnDOWNXph7mmIo");
+
+            //        PowerShellInst.AddParameter("containername", containername);
+            //        PowerShellInst.AddParameter("podname", podname);
+            //        PowerShellInst.AddParameter("dbname", dbname);
+            //        PowerShellInst.AddParameter("dbusername", dbusername);
+            //        PowerShellInst.AddParameter("dbpassword", dbpassword);
+            //        PowerShellInst.AddParameter("rootuser", rootuser);
+            //        PowerShellInst.AddParameter("rootpassword", rootpassword);
+
+            //        PowerShellInst.AddParameter("envname", "Development");
+            //        PowerShellInst.AddParameter("appname", appname);
+
+            //        //PowerShellInst.AddParameter("ErrorAction", "Stop");                    
+            //        PowerShellInst.AddCommand("Set-ExecutionPolicy");
+            //        PowerShellInst.AddParameter("ExecutionPolicy", "unrestricted");
+            //    }
+
+            //    Collection<PSObject> PSOutput = PowerShellInst.Invoke("Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned");
+            //    foreach (PSObject obj in PSOutput)
+            //    {                   
+            //        if (obj != null)
+            //        {
+            //        }
+
+            //        if (obj != null)
+            //        {
+            //            Console.Write(obj.Properties["EntryType"].Value.ToString() + " - ");
+            //            Console.Write(obj.Properties["Source"].Value.ToString() + " - ");
+            //            Console.WriteLine(obj.Properties["Message"].Value.ToString() + " - ");
+            //        }
+            //    }
+            //    Console.WriteLine("Done");
+            //  Console.Read();
+            //}
+        }
+        
         // GET: Subscription/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -101,10 +230,26 @@ namespace SubscriptionPortal.Controllers
                 //subscription.Userid = TempData["Userid"].ToString();
                 subscription.Userid = HttpContext.Session.GetString("userid");
 
-                _context.Add(subscription);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ////_context.Add(subscription);
+                ////await _context.SaveChangesAsync();
+
+                ////Thread.Sleep(5000);
+
+                string containername = "mysqldb" + subscription.CompanyName.Trim();
+                string podname = "mysqldb" + subscription.CompanyName.Trim();
+                string dbname = "mysqldb" + subscription.CompanyName.Trim();
+                string dbusername = "dbusername";
+                string dbpassword = "dbusername";
+                string rootuser = "root";
+                string rootpassword = "dbpassword";
+
+                string appname = subscription.ApplicationName.Trim().ToString().ToLower().Replace(' ', '-') + '-' + subscription.CompanyName.Trim();
+
+                RunPowershellScript(containername, podname, dbname, dbusername, dbpassword, rootuser, rootpassword, appname);
+                              
+                //return RedirectToAction(nameof(Index));
             }
+            
             return View(subscription);
         }
 
