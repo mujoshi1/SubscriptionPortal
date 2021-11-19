@@ -20,7 +20,7 @@ namespace SubscriptionPortal.Controllers
     public class SubscriptionController : Controller
     {
         private readonly SubscriptionPortalContext _context;
-        public string ApplicationName { get; set; }
+        //public string ApplicationName { get; set; }
         public SubscriptionController(SubscriptionPortalContext context)
         {
             _context = context;
@@ -70,9 +70,67 @@ namespace SubscriptionPortal.Controllers
             ////return View(subscription);
 
         }
+        // GET: Subscription/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
+            var subscription = await _context.Subscription
+                .FirstOrDefaultAsync(m => m.SubscriptionId == id || m.Userid == HttpContext.Session.GetString("userid") );
+            if (subscription == null)
+            {
+                return NotFound();
+            }
 
-        private static void RunPowershellScript(string containername, string podname, string dbname, string dbusername, string dbpassword, string rootuser, string rootpassword, string appname)
+            return View(subscription);
+        }
+
+        // GET: Subscription/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: Subscription/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
+        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("SubscriptionId,ApplicationName,CompanyName,DBName,DBUserId,DBUserPassword,EmailId,Location,Userid")] Subscription subscription)
+        {
+            if (ModelState.IsValid)
+            {
+                subscription.Userid = ViewBag.userid;
+                //subscription.Userid = TempData["Userid"].ToString();
+                subscription.Userid = HttpContext.Session.GetString("userid");
+
+                ////_context.Add(subscription);
+                ////await _context.SaveChangesAsync();
+
+                ////Thread.Sleep(5000);
+
+                string containername = "mysqldb" + subscription.CompanyName.Trim();
+                string podname = "mysqldb" + subscription.CompanyName.Trim();
+                string dbname = "mysqldb" + subscription.CompanyName.Trim();
+                string dbusername = "dbusername";
+                string dbpassword = "dbusername";
+                string rootuser = "root";
+                string rootpassword = "dbpassword";
+
+                string appname = subscription.ApplicationName.Trim().ToString().ToLower().Replace(' ', '-') + '-' + subscription.CompanyName.Trim();
+
+                List<object> output =  RunPowershellScript(containername, podname, dbname, dbusername, dbpassword, rootuser, rootpassword, appname);
+                ViewBag.error = output[0];
+                ViewBag.results = output[1];
+                //return RedirectToAction(nameof(Index));
+            }
+            
+            return View(subscription);
+        }
+        public List<object> RunPowershellScript(string containername, string podname, string dbname, string dbusername, string dbpassword, string rootuser, string rootpassword, string appname)
         {
             string fullPath = Path.GetFullPath("Files/0.mysqlscript.ps1");
             //string fileName = Path.GetFileName("Files/0.mysqlscript.ps1");
@@ -144,6 +202,7 @@ namespace SubscriptionPortal.Controllers
             {
             }
 
+
             ////Execute PS1(PowerShell script) file
             //using (PowerShell PowerShellInst = PowerShell.Create())
             //{
@@ -191,68 +250,11 @@ namespace SubscriptionPortal.Controllers
             //    Console.WriteLine("Done");
             //  Console.Read();
             //}
+            List<object> output = new List<object>();
+            output.Add(error);
+            output.Add(results);
+            return output;
         }
-        
-        // GET: Subscription/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var subscription = await _context.Subscription
-                .FirstOrDefaultAsync(m => m.SubscriptionId == id || m.Userid == HttpContext.Session.GetString("userid") );
-            if (subscription == null)
-            {
-                return NotFound();
-            }
-
-            return View(subscription);
-        }
-
-        // GET: Subscription/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Subscription/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("SubscriptionId,ApplicationName,CompanyName,DBName,DBUserId,DBUserPassword,EmailId,Location,Userid")] Subscription subscription)
-        {
-            if (ModelState.IsValid)
-            {
-                subscription.Userid = ViewBag.userid;
-                //subscription.Userid = TempData["Userid"].ToString();
-                subscription.Userid = HttpContext.Session.GetString("userid");
-
-                ////_context.Add(subscription);
-                ////await _context.SaveChangesAsync();
-
-                ////Thread.Sleep(5000);
-
-                string containername = "mysqldb" + subscription.CompanyName.Trim();
-                string podname = "mysqldb" + subscription.CompanyName.Trim();
-                string dbname = "mysqldb" + subscription.CompanyName.Trim();
-                string dbusername = "dbusername";
-                string dbpassword = "dbusername";
-                string rootuser = "root";
-                string rootpassword = "dbpassword";
-
-                string appname = subscription.ApplicationName.Trim().ToString().ToLower().Replace(' ', '-') + '-' + subscription.CompanyName.Trim();
-
-                RunPowershellScript(containername, podname, dbname, dbusername, dbpassword, rootuser, rootpassword, appname);
-                              
-                //return RedirectToAction(nameof(Index));
-            }
-            
-            return View(subscription);
-        }
-
         // GET: Subscription/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {

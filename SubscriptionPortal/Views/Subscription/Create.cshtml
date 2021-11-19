@@ -4,64 +4,111 @@
     ViewData["Title"] = "Create";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-<h3>Add Application Subscription</h3>
+<h5>Add Application Subscription</h5>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="ApplicationName" class="control-label"></label>
-                @*<label class="control-label"> Select Application</label>*@
-            <select asp-for="ApplicationName" asp-items="@ViewBag.ApplicationName" class="custom-select">
-                <option value="0">Select Application</option>
-                <option value="HR Office">HR Office</option>
-                <option value="Gift Register">Gift Register</option>
-                <option value="Meeting Expense">Meeting Expense</option>
-                <option value="Man Power">Man Power</option>
-                <option value="New Hire">New Hire</option>
-            </select>
-            </div>
-            <div class="form-group">
-                <label asp-for="CompanyName" class="control-label"></label>
-                <input asp-for="CompanyName" class="form-control" maxlength="5" />
-                <span asp-validation-for="CompanyName" class="text-danger"></span>
-            </div>
-            <div class="form-group" contenteditable="false">
-                <label asp-for="DBName" class="control-label"></label>
-                <input asp-for="DBName" class="form-control" />
-                @*<span asp-validation-for="DBName" class="text-danger"></span>*@
-            </div>
-            <div class="form-group">
-                <label asp-for="DBUserId" class="control-label"></label>
-                <input asp-for="DBUserId" class="form-control" />
-                <span asp-validation-for="DBUserId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DBUserPassword" class="control-label"></label>
-                <input asp-for="DBUserPassword" class="form-control" />
-                <span asp-validation-for="DBUserPassword" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EmailId" class="control-label"></label>
-                <input asp-for="EmailId" class="form-control" />
-                <span asp-validation-for="EmailId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Location" class="control-label"></label>
-                <input asp-for="Location" class="form-control" />
-                <span asp-validation-for="Location" class="text-danger"></span>
-            </div>
-            <input type="hidden" asp-for="Userid" asp-items="@ViewBag.Userid" />
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
+<div class="container">
+    <section class="col-md-12 col-md-push-0">
+        <div class="row">            
+                <div class="col-md-4 col-md-push-0">
+                    <div class="row">
+                        <form asp-action="Create" >
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <label asp-for="ApplicationName" class="control-label"></label>
+                                @*<label class="control-label"> Select Application</label>*@
+                                <select asp-for="ApplicationName" asp-items="@ViewBag.ApplicationName" class="custom-select">
+                                    <option value="0">Select Application</option>
+                                    <option value="HR Office">HR Office</option>
+                                    <option value="Gift Register">Gift Register</option>
+                                    <option value="Meeting Expense">Meeting Expense</option>
+                                    <option value="Man Power">Man Power</option>
+                                    <option value="New Hire">New Hire</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="CompanyName" class="control-label"></label>
+                                <input asp-for="CompanyName" class="form-control" maxlength="5" />
+                                <span asp-validation-for="CompanyName" class="text-danger"></span>
+                            </div>
+                            <div class="form-group" contenteditable="false">
+                                <label asp-for="DBName" class="control-label"></label>
+                                <input asp-for="DBName" class="form-control" />
+                                @*<span asp-validation-for="DBName" class="text-danger"></span>*@
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="DBUserId" class="control-label"></label>
+                                <input asp-for="DBUserId" class="form-control" />
+                                <span asp-validation-for="DBUserId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="DBUserPassword" class="control-label"></label>
+                                <input asp-for="DBUserPassword" class="form-control" />
+                                <span asp-validation-for="DBUserPassword" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="EmailId" class="control-label"></label>
+                                <input asp-for="EmailId" class="form-control" />
+                                <span asp-validation-for="EmailId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Location" class="control-label"></label>
+                                <input asp-for="Location" class="form-control" />
+                                <span asp-validation-for="Location" class="text-danger"></span>
+                            </div>
+                            <input type="hidden" asp-for="Userid" asp-items="@ViewBag.Userid" />
+                            <div class="form-group">
+                                <input type="submit" value="Create" class="btn btn-primary" />
+                            </div>
+                        </form>
+                        <div>
+                            <a asp-action="Index">Back to List</a>
+                        </div>
+                    </div>                    
+                </div>
+                <div id="mainCalc" class="col-md-8 col-md-push-0">
+                    <div class="row">
+                        <div class="col-md-8 col-md-push-0">
+                            <div class="row">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Error: </th>
+                                        </tr>
+                                    </thead>
+                                    @if (ViewBag.error != null)
+                                    {
+                                        @foreach (var Error in ViewBag.error)
+                                        {
+                                            <tr>
+                                                <td>@Error.ToString()</td>
+                                            </tr>
+                                        }
+                                    }
+                                </table>
+                                </div>
+                            </div>
+                        <div class="col-md-8 col-md-push-0">
+                            <div class="row">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Results: </th>
+                                        </tr>
+                                    </thead>
+                                    @if (ViewBag.error != null)
+                                    {
+                                        @foreach (var Results in ViewBag.results)
+                                        {
+                                            <tr>
+                                                <td>@Results.ToString()</td>
+                                            </tr>
+                                        }
+                                    }
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </section>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-

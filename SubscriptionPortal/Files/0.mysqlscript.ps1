@@ -123,14 +123,29 @@ oc project "mujoshi1-2-stage"
 Write-Output "login successfully"
 Write-Output $servertoken
 
-timeout /t 2
+timeout /t 1
 
 Write-Output "create mysql pod  as deployment_config"
 oc new-app --name=$podname  MYSQL_DATABASE=$dbname  MYSQL_USER=$dbusername  MYSQL_PASSWORD=$dbpassword  MYSQL_ROOT_PASSWORD=$rootpassword  registry.access.redhat.com/openshift3/mysql-55-rhel7
 Write-Output "create mysql pod"
 
-timeout /t 2
-#oc new-app --name=hrappyrr  MYSQL_DATABASE=hrappyrr  MYSQL_USER=hrappyrr  MYSQL_PASSWORD=dbpassword  MYSQL_ROOT_PASSWORD=rootpassword  registry.access.redhat.com/openshift3/mysql-55-rhel7
+timeout /t 1
+
+Write-Output "create Dotnet app"
+oc new-app --name=$appname dotnet:3.1~https://github.com/mujoshi1/OpenShiftHrOffice#master --context-dir HrOffice
+
+Write-Output "Set  .Net application Environment  adn sqldb connection"
+oc set env  --overwrite  deployment/$appname  ASPNETCORE_ENVIRONMENT=$envname  DBHOST=$dbname  DBPORT=3306  DBNAME=$dbname  DBUSER=$dbusername  DBPASSWORD=$dbpassword
+
+timeout /t 1
+
+Write-Output "oc expose service"
+oc expose service $appname
+
+timeout /t 1
+
+Write-Output"oc get route "
+oc get route $appname
 
 #) -UseTransaction
 Stop-Transcript
