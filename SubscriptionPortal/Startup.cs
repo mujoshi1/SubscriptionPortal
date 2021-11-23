@@ -41,7 +41,7 @@ namespace SubscriptionPortal
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             //ASPNETCORE_ENVIRONMENT  = Development
-            var host = Configuration["DBHOST"] ?? "localhost";//127/0.0.1 / env Variable /Container name  /mysqlsubscriptiondb
+            var host = Configuration["DBHOST"] ?? "localhost";//127/0.0.1 / env Variable /Container name  /subscriptiondb
             var port = Configuration["DBPORT"] ?? "3306";
             var databasename = Configuration["DBNAME"] ?? "subscriptiondb";   //"hrdbdev";  // SubscriptionPortaldb
             var userid = Configuration["DBUSER"] ?? "subscriptionuser";// "hrusername"; //SubscriptionPortaluser

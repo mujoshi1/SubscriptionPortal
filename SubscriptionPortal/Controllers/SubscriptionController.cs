@@ -104,28 +104,28 @@ namespace SubscriptionPortal.Controllers
             if (ModelState.IsValid)
             {
                 subscription.Userid = ViewBag.userid;
-                //subscription.Userid = TempData["Userid"].ToString();
+                subscription.Userid = TempData["Userid"].ToString();
                 subscription.Userid = HttpContext.Session.GetString("userid");
 
-                ////_context.Add(subscription);
-                ////await _context.SaveChangesAsync();
+                _context.Add(subscription);
+                await _context.SaveChangesAsync();
 
                 ////Thread.Sleep(5000);
 
-                string containername = "mysqldb" + subscription.CompanyName.Trim();
-                string podname = "mysqldb" + subscription.CompanyName.Trim();
-                string dbname = "mysqldb" + subscription.CompanyName.Trim();
-                string dbusername = "dbusername";
-                string dbpassword = "dbusername";
-                string rootuser = "root";
-                string rootpassword = "dbpassword";
+                //string containername = "mysqldb" + subscription.CompanyName.Trim();
+                //string podname = "mysqldb" + subscription.CompanyName.Trim();
+                //string dbname = "mysqldb" + subscription.CompanyName.Trim();
+                //string dbusername = "dbusername";
+                //string dbpassword = "dbusername";
+                //string rootuser = "root";
+                //string rootpassword = "dbpassword";
 
-                string appname = subscription.ApplicationName.Trim().ToString().ToLower().Replace(' ', '-') + '-' + subscription.CompanyName.Trim();
+               // string appname = subscription.ApplicationName.Trim().ToString().ToLower().Replace(' ', '-') + '-' + subscription.CompanyName.Trim();
 
-                List<object> output =  RunPowershellScript(containername, podname, dbname, dbusername, dbpassword, rootuser, rootpassword, appname);
-                ViewBag.error = output[0];
-                ViewBag.results = output[1];
-                //return RedirectToAction(nameof(Index));
+               // List<object> output =  RunPowershellScript(containername, podname, dbname, dbusername, dbpassword, rootuser, rootpassword, appname);
+              //  ViewBag.error = output[0];
+               // ViewBag.results = output[1];
+              return RedirectToAction(nameof(Index));
             }
             
             return View(subscription);
