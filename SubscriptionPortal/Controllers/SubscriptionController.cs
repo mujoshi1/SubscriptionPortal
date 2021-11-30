@@ -103,6 +103,7 @@ namespace SubscriptionPortal.Controllers
         {
             if (ModelState.IsValid)
             {
+                subscription.RequestStatus = "Pending";
                 subscription.Userid = ViewBag.userid;
                 subscription.Userid = TempData["Userid"].ToString();
                 subscription.Userid = HttpContext.Session.GetString("userid");

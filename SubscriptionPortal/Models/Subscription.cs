@@ -42,6 +42,14 @@ namespace SubscriptionPortal.Models
         [DisplayName("Work Location")]
         public string Location { get; set; }
 
+        [MaxLength(50)]
+        [DisplayName("Application Status")]
+        public string RequestStatus { get; set; }
+
+        [MaxLength(500)]
+        [DisplayName("Application URL")]
+        public string ApplicationURL { get; set; }       
+
         [MaxLength(2)]
         [DisplayName("UserId")]
         public string Userid { get; set; }

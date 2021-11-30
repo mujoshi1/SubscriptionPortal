@@ -31,6 +31,12 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Location)
+            </th>           
+            <th>
+                @Html.DisplayNameFor(model => model.RequestStatus)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ApplicationURL)
             </th>
             <th></th>
         </tr>
@@ -38,34 +44,40 @@
     <tbody>        
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ApplicationName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CompanyName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DBName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DBUserId)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DBUserPassword)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.EmailId)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Location)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.SubscriptionId">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.SubscriptionId">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.SubscriptionId">Delete</a>
-                </td>
-            </tr>
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ApplicationName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CompanyName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DBName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DBUserId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DBUserPassword)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EmailId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Location)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RequestStatus)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ApplicationURL)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.SubscriptionId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.SubscriptionId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.SubscriptionId">Delete</a>
+            </td>
+        </tr>
         }
     </tbody>
 </table>
