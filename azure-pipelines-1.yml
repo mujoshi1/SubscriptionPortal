@@ -7,7 +7,7 @@ trigger:
 - master
 
 pool:
-  default: 'IBM-PF3PFL7Z'
+  name: 'default'
 
 variables:
   solution: '**/*.sln'
